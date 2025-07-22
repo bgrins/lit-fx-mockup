@@ -167,6 +167,12 @@ You have access to the `playwright` tool. I will run a development server in ano
 npm run test:visual  # Compare against reference screenshots
 ```
 
+The Playwright HTML report is automatically served at http://localhost:9323/ after running visual tests. You can navigate to this URL using the Playwright browser tools to view:
+- Test results and pass/fail status
+- Visual comparisons between actual and expected screenshots
+- Test execution timeline and steps
+- Any differences highlighted in failed tests
+
 ### Unit Testing
 ```bash
 npm test  # Run Vitest unit tests
