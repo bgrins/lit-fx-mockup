@@ -6,13 +6,25 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:visual": "playwright test",
+    "lint": "eslint . --ext .ts,.js",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "lit": "^3.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^24.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.31.0",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.25.1"
   }
 }
