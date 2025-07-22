@@ -28,29 +28,35 @@ export class NavigationBar extends LitElement {
       align-items: center;
       justify-content: center;
       border-radius: 4px;
-      color: var(--firefox-text-secondary);
-      transition: background 0.2s;
+      color: var(--firefox-icon-secondary);
+      transition:
+        background 0.2s,
+        color 0.2s;
       position: relative;
     }
 
     .nav-button:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--firefox-hover);
+      color: var(--firefox-icon-hover);
     }
 
     .nav-button:disabled {
-      opacity: 0.4;
+      color: var(--firefox-icon-disabled);
       cursor: not-allowed;
     }
 
-    .nav-button svg {
+    .nav-button svg,
+    .nav-button img {
       width: 16px;
       height: 16px;
+      -moz-context-properties: fill;
+      fill: currentColor;
     }
 
     .urlbar-container {
       flex: 1;
       height: var(--urlbar-height);
-      background: #42414d;
+      background: var(--firefox-tab-bg);
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -62,8 +68,8 @@ export class NavigationBar extends LitElement {
     }
 
     .urlbar-container:focus-within {
-      outline-color: #00ddff;
-      background: #52515e;
+      outline-color: var(--firefox-accent);
+      background: var(--firefox-tab-active-bg);
     }
 
     .urlbar-input {
@@ -104,27 +110,16 @@ export class NavigationBar extends LitElement {
     return html`
       <!-- Navigation buttons -->
       <button class="nav-button" @click=${this.handleBack} disabled>
-        <svg viewBox="0 0 16 16" fill="currentColor">
-          <path d="M11 14L5 8l6-6v12z" />
-        </svg>
+        <img src="/src/assets/browser/themes/shared/icons/back.svg" alt="Back" />
       </button>
       <button class="nav-button" @click=${this.handleForward} disabled>
-        <svg viewBox="0 0 16 16" fill="currentColor">
-          <path d="M5 2l6 6-6 6V2z" />
-        </svg>
+        <img src="/src/assets/browser/themes/shared/icons/forward.svg" alt="Forward" />
       </button>
       <button class="nav-button" @click=${this.handleRefresh}>
-        <svg viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M13.65 2.35A8 8 0 102.35 13.65 8 8 0 0013.65 2.35zm-1.4 9.9A6 6 0 118 2a6 6 0 014.25 10.25z"
-          />
-          <path d="M8 1v4l3-3-3-3z" />
-        </svg>
+        <img src="/src/assets/browser/themes/shared/icons/reload-to-stop.svg" alt="Refresh" />
       </button>
       <button class="nav-button" @click=${this.handleHome}>
-        <svg viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 1L1 7v8h5v-5h4v5h5V7z" />
-        </svg>
+        <img src="/src/assets/browser/themes/shared/icons/home.svg" alt="Home" />
       </button>
 
       <!-- URL Bar -->
@@ -158,15 +153,14 @@ export class NavigationBar extends LitElement {
         </button>
         <div class="separator"></div>
         <button class="nav-button" title="Account">
-          <svg viewBox="0 0 16 16" fill="currentColor">
-            <circle cx="8" cy="6" r="3" />
-            <path d="M8 9c-3 0-5 1.5-5 4v1h10v-1c0-2.5-2-4-5-4z" />
-          </svg>
+          <img src="/src/assets/browser/themes/shared/fxa/avatar.svg" alt="Account" />
         </button>
-        <button class="nav-button" title="Open application menu" @click=${this.handleMenuClick}>
-          <svg viewBox="0 0 16 16" fill="currentColor">
-            <path d="M2 3h12v2H2V3zm0 4h12v2H2V7zm0 4h12v2H2v-2z" />
-          </svg>
+        <button
+          class="nav-button menu-button"
+          title="Open application menu"
+          @click=${this.handleMenuClick}
+        >
+          <img src="/src/assets/browser/themes/shared/icons/menu.svg" alt="Menu" />
         </button>
       </div>
     `;

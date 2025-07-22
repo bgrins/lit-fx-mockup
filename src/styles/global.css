@@ -1,4 +1,5 @@
 :root {
+  /* Dark theme (default) */
   --firefox-bg: #1c1b22;
   --firefox-toolbar-bg: #2b2a33;
   --firefox-tab-bg: #42414d;
@@ -9,6 +10,17 @@
   --firefox-accent: #00ddff;
   --firefox-hover: rgba(255, 255, 255, 0.05);
 
+  /* Icon colors */
+  --firefox-icon-primary: #fbfbfe;
+  --firefox-icon-secondary: #bfbfc9;
+  --firefox-icon-disabled: #5c5c66;
+  --firefox-icon-hover: #ffffff;
+  --firefox-icon-active: #00ddff;
+
+  /* Content area colors */
+  --firefox-content-bg: #f9f9fb;
+  --firefox-content-text: #15141a;
+
   --mac-close: #ff5f57;
   --mac-minimize: #ffbd2e;
   --mac-maximize: #28ca42;
@@ -16,6 +28,30 @@
   --toolbar-height: 40px;
   --urlbar-height: 32px;
   --tab-height: 36px;
+}
+
+/* Light theme */
+:root[data-theme='light'] {
+  --firefox-bg: #ffffff;
+  --firefox-toolbar-bg: #f0f0f4;
+  --firefox-tab-bg: #e1e1e6;
+  --firefox-tab-active-bg: #ffffff;
+  --firefox-text: #15141a;
+  --firefox-text-secondary: #5b5b66;
+  --firefox-border: #cfcfd8;
+  --firefox-accent: #0060df;
+  --firefox-hover: rgba(0, 0, 0, 0.05);
+
+  /* Icon colors for light theme */
+  --firefox-icon-primary: #15141a;
+  --firefox-icon-secondary: #5b5b66;
+  --firefox-icon-disabled: #b3b3bd;
+  --firefox-icon-hover: #000000;
+  --firefox-icon-active: #0060df;
+
+  /* Content area colors for light theme */
+  --firefox-content-bg: #ffffff;
+  --firefox-content-text: #15141a;
 }
 
 * {

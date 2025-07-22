@@ -61,4 +61,12 @@ describe('NavigationBar', () => {
     await element.updateComplete;
     expect(menuClicked).toBe(true);
   });
+
+  it('hamburger menu button has menu-button class', () => {
+    const menuButton = element.shadowRoot!.querySelector(
+      'button[title="Open application menu"]'
+    ) as HTMLButtonElement;
+    expect(menuButton).toBeTruthy();
+    expect(menuButton.classList.contains('menu-button')).toBe(true);
+  });
 });

@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
-interface Tab {
+export interface Tab {
   id: string;
   title: string;
   favicon?: string;
@@ -11,7 +11,7 @@ interface Tab {
 @customElement('tab-bar')
 export class TabBar extends LitElement {
   @state()
-  private tabs: Tab[] = [
+  tabs: Tab[] = [
     {
       id: 'firefox-view',
       title: 'Firefox View',
@@ -21,15 +21,13 @@ export class TabBar extends LitElement {
     {
       id: '1',
       title: 'Wikipedia, the free encyclopedia',
-      favicon:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Xxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
+      favicon: '/src/assets/sites/wikipedia.ico',
       active: true,
     },
     {
       id: '2',
       title: 'The Wild Story of th...',
-      favicon:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Wxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
+      favicon: '/src/assets/sites/pocket.ico',
       active: false,
     },
   ];
@@ -40,16 +38,14 @@ export class TabBar extends LitElement {
   static styles = css`
     :host {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       height: 100%;
-      gap: 4px;
       flex: 1;
     }
 
     .tabs-container {
       display: flex;
-      align-items: center;
-      gap: 1px;
+      align-items: stretch;
       flex: 1;
       height: 100%;
       padding-top: 4px;
@@ -58,35 +54,57 @@ export class TabBar extends LitElement {
     .tab {
       display: flex;
       align-items: center;
-      height: calc(100% - 4px);
+      height: 100%;
       min-width: 50px;
       max-width: 240px;
       padding: 0 12px;
-      background: #42414d;
+      background: var(--firefox-toolbar-bg);
       border-radius: 4px 4px 0 0;
       cursor: pointer;
       position: relative;
       transition: background 0.2s;
       gap: 8px;
-      border: 1px solid transparent;
+      border: 1px solid rgba(255, 255, 255, 0.05);
       border-bottom: none;
-      margin: 0 -1px;
+      margin-right: 1px;
+    }
+
+    .tab.firefox-view {
+      min-width: 40px;
+      max-width: 40px;
+      padding: 0 8px;
+      gap: 0;
+      justify-content: center;
+      margin-right: 8px;
     }
 
     .tab:hover {
-      background: #52515e;
+      background: var(--firefox-hover);
     }
 
     .tab.active {
-      background: #2b2a33;
-      border-color: rgba(255, 255, 255, 0.1);
+      background: var(--firefox-tab-bg);
+      border-color: var(--firefox-border);
       z-index: 1;
+      position: relative;
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--firefox-tab-bg);
     }
 
     .tab-favicon {
       width: 16px;
       height: 16px;
       flex-shrink: 0;
+      -moz-context-properties: fill;
+      fill: currentColor;
     }
 
     .tab-title {
@@ -111,11 +129,12 @@ export class TabBar extends LitElement {
       align-items: center;
       justify-content: center;
       border-radius: 2px;
-      color: var(--firefox-text-secondary);
+      color: var(--firefox-icon-secondary);
       opacity: 0;
       transition:
         opacity 0.2s,
-        background 0.2s;
+        background 0.2s,
+        color 0.2s;
     }
 
     .tab:hover .tab-close,
@@ -124,7 +143,8 @@ export class TabBar extends LitElement {
     }
 
     .tab-close:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--firefox-hover);
+      color: var(--firefox-icon-hover);
     }
 
     .tab-close::before {
@@ -143,19 +163,24 @@ export class TabBar extends LitElement {
       align-items: center;
       justify-content: center;
       border-radius: 4px;
-      color: var(--firefox-text-secondary);
-      transition: background 0.2s;
-      margin: 0 4px;
+      color: var(--firefox-icon-secondary);
+      transition:
+        background 0.2s,
+        color 0.2s;
+      margin-left: 2px;
+      align-self: center;
     }
 
     .new-tab:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--firefox-hover);
+      color: var(--firefox-icon-hover);
     }
 
-    .new-tab::before {
-      content: '+';
-      font-size: 20px;
-      font-weight: 300;
+    .new-tab img {
+      width: 16px;
+      height: 16px;
+      -moz-context-properties: fill;
+      fill: currentColor;
     }
 
     .toolbar-end {
@@ -163,6 +188,7 @@ export class TabBar extends LitElement {
       align-items: center;
       margin-left: auto;
       padding: 0 8px;
+      align-self: center;
     }
 
     .menu-button {
@@ -175,23 +201,29 @@ export class TabBar extends LitElement {
       align-items: center;
       justify-content: center;
       border-radius: 4px;
-      color: var(--firefox-text-secondary);
-      transition: background 0.2s;
+      color: var(--firefox-icon-secondary);
+      transition:
+        background 0.2s,
+        color 0.2s;
     }
 
     .menu-button:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--firefox-hover);
+      color: var(--firefox-icon-hover);
     }
 
-    .menu-button svg {
+    .menu-button svg,
+    .menu-button img {
       width: 16px;
       height: 16px;
+      -moz-context-properties: fill;
+      fill: currentColor;
     }
 
     .firefox-view-icon {
       width: 16px;
       height: 16px;
-      color: var(--firefox-text-secondary);
+      color: var(--firefox-icon-secondary);
     }
   `;
 
@@ -201,40 +233,43 @@ export class TabBar extends LitElement {
         ${this.tabs.map(
           (tab) => html`
             <div
-              class="tab ${tab.active ? 'active' : ''}"
+              class="tab ${tab.active ? 'active' : ''} ${tab.id === 'firefox-view'
+                ? 'firefox-view'
+                : ''}"
               @click=${() => this.handleTabClick(tab.id)}
             >
-              ${tab.favicon === 'firefox-view'
-                ? html`<svg class="firefox-view-icon" viewBox="0 0 16 16" fill="currentColor">
-                    <path
-                      d="M3 2a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1H3zm1 2h8v8H4V4z"
-                    />
-                    <path d="M5 5h6v1H5V5zm0 2h6v1H5V7zm0 2h4v1H5V9z" />
-                  </svg>`
+              ${tab.id === 'firefox-view'
+                ? html`<img
+                    class="tab-favicon"
+                    src="/src/assets/browser/themes/shared/icons/firefox-view.svg"
+                    alt="Firefox View"
+                  />`
                 : tab.favicon
                   ? html`<img class="tab-favicon" src=${tab.favicon} alt="" />`
                   : ''}
-              <span class="tab-title">${tab.title}</span>
-              <button
-                class="tab-close"
-                @click=${(e: Event) => this.handleCloseTab(e, tab.id)}
-              ></button>
+              ${tab.id !== 'firefox-view' ? html`<span class="tab-title">${tab.title}</span>` : ''}
+              ${tab.id !== 'firefox-view'
+                ? html`<button
+                    class="tab-close"
+                    @click=${(e: Event) => this.handleCloseTab(e, tab.id)}
+                  ></button>`
+                : ''}
             </div>
           `
         )}
-        <button class="new-tab" @click=${this.handleNewTab}></button>
+        <button class="new-tab" @click=${this.handleNewTab}>
+          <img src="/src/assets/browser/themes/shared/icons/new-tab.svg" alt="New Tab" />
+        </button>
       </div>
       <div class="toolbar-end">
         <button class="menu-button" @click=${this.handleMenu} title="List all tabs">
-          <svg viewBox="0 0 16 16" fill="currentColor">
-            <path d="M4 6l4 4 4-4H4z" />
-          </svg>
+          <img src="/src/assets/toolkit/themes/shared/icons/sort-arrow.svg" alt="Tab Menu" />
         </button>
       </div>
     `;
   }
 
-  private handleTabClick(tabId: string) {
+  handleTabClick(tabId: string) {
     this.tabs = this.tabs.map((tab) => ({
       ...tab,
       active: tab.id === tabId,
@@ -249,8 +284,13 @@ export class TabBar extends LitElement {
     );
   }
 
-  private handleCloseTab(e: Event, tabId: string) {
+  handleCloseTab(e: Event, tabId: string) {
     e.stopPropagation();
+
+    // Prevent closing Firefox View tab
+    if (tabId === 'firefox-view') {
+      return;
+    }
 
     if (this.tabs.length === 1) {
       return;
@@ -276,7 +316,7 @@ export class TabBar extends LitElement {
     );
   }
 
-  private handleNewTab() {
+  handleNewTab() {
     const newTab: Tab = {
       id: `tab-${Date.now()}`,
       title: 'New Tab',

@@ -178,12 +178,21 @@ The Playwright HTML report is automatically served at http://localhost:9323/ aft
 npm test  # Run Vitest unit tests
 ```
 
+### Precommit checklist
+
+- `npm run precommit`. Fix all errors, do not be lazy.
+
 ### Keyboard Shortcuts
-Implement common shortcuts:
-- Ctrl/Cmd+T: New tab
-- Ctrl/Cmd+W: Close tab
-- Ctrl/Cmd+L: Focus URL bar
-- Ctrl/Cmd+B: Toggle sidebar
+
+All shortcuts use the **Alt** key to avoid conflicts with browser shortcuts:
+
+- **Alt+T**: New tab
+- **Alt+W**: Close current tab
+- **Alt+L**: Focus URL bar
+- **Alt+1-9**: Switch to tab by number
+- **Alt+Shift+T**: Toggle between light/dark theme
+
+Note: Using Alt key instead of Cmd/Ctrl ensures these shortcuts work reliably in all browsers without being intercepted.
 
 ## Implementation Notes
 - Start with the window shell and work inward

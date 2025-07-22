@@ -19,17 +19,17 @@ export class PanelMenu extends LitElement {
     }
 
     .panel {
-      background: #42414d;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      min-width: 320px;
+      background: #2b2a33;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      min-width: 280px;
       max-width: 400px;
       opacity: 0;
       transform: translateY(-10px);
       transition:
-        opacity 0.2s,
-        transform 0.2s;
+        opacity 0.15s,
+        transform 0.15s;
       pointer-events: none;
       display: none;
     }
@@ -42,15 +42,16 @@ export class PanelMenu extends LitElement {
     }
 
     .panel-header {
-      padding: 16px;
+      padding: 12px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 600;
-      font-size: 16px;
+      font-weight: 500;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
     }
 
     .panel-content {
-      padding: 8px 0;
-      max-height: 400px;
+      padding: 4px 0;
+      max-height: 600px;
       overflow-y: auto;
     }
 
@@ -78,7 +79,7 @@ export class PanelMenu extends LitElement {
     .menu-separator {
       height: 1px;
       background: rgba(255, 255, 255, 0.1);
-      margin: 8px 0;
+      margin: 4px 0;
     }
 
     .submenu-indicator {
