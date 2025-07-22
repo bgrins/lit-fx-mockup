@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__zoo-playwright__browser_navigate",
+      "mcp__zoo-playwright__browser_snapshot",
+      "mcp__zoo-playwright__browser_click",
+      "mcp__zoo-playwright__browser_type",
+      "mcp__zoo-playwright__browser_take_screenshot",
+      "mcp__zoo-playwright__browser_console_messages",
+      "mcp__zoo-playwright__browser_network_requests",
+      "mcp__zoo-playwright__browser_close",
+      "mcp__zoo-playwright__browser_select_option",
+      "mcp__zoo-playwright__browser_tab_new",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "Bash(npm test)",
+      "Bash(npm run test)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)"
+    ],
+    "deny": []
+  }
+}

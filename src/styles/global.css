@@ -1,0 +1,28 @@
+:root {
+  --firefox-bg: #1c1b22;
+  --firefox-toolbar-bg: #2b2a33;
+  --firefox-tab-bg: #42414d;
+  --firefox-tab-active-bg: #52515e;
+  --firefox-text: #fbfbfe;
+  --firefox-text-secondary: #bfbfc9;
+  --firefox-border: #3a394d;
+  --firefox-accent: #00ddff;
+  --firefox-hover: rgba(255, 255, 255, 0.05);
+
+  --mac-close: #ff5f57;
+  --mac-minimize: #ffbd2e;
+  --mac-maximize: #28ca42;
+
+  --toolbar-height: 40px;
+  --urlbar-height: 32px;
+  --tab-height: 36px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
