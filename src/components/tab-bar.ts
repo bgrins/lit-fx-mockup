@@ -13,15 +13,23 @@ export class TabBar extends LitElement {
   @state()
   private tabs: Tab[] = [
     {
+      id: 'firefox-view',
+      title: 'Firefox View',
+      favicon: 'firefox-view', // Special case for Firefox View icon
+      active: false,
+    },
+    {
       id: '1',
       title: 'Wikipedia, the free encyclopedia',
-      favicon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Xxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
+      favicon:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Xxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
       active: true,
     },
     {
       id: '2',
       title: 'The Wild Story of th...',
-      favicon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Xxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
+      favicon:
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHWSURBVDiNpZOxaxRBFMZ/b2ZnZw+5XBQDQRAVIYVYiIUgFoJY2NjYWNraWFjY2Pr3WFiIYCFYCDYiNiIWgiBYeIiCF0RJvNzN7e7M7FtYmL3b3IsJPpjmzbz3fd+8N/OElJKttLKysqfb7R4HMUsp20BHKT2rlLquFB0AKSVbSQjxVEq5L2Lt+35SSjlVLBavB0FwxXXde0mSPLFt+5VhGLvquu5EEAQnoihaBaZM09yf2UII8SyO48PZYtu2J4IguAAwMjKCaZqkaUoYhlwsl7murheq1Wqr0+kM5XK5bQP0PO8cgFLqBTALMDs7q9M0ZXFxEaUUhmFQKpWuViqVl0B9YCsRQrwD9gDMzMxMDw0NfQD2ZnXf9xFCMDo6SrFYBOgC9QzEMAy01iil8H0f3/dpt9tMTk7+7263SxRFrK+v43kebrf7DfgMbM8+oJQiCAJWV1dRSpEkCV999zvQ2AxumiZxHBPHMVrrXhBjY2OUSiWazSaNRgOtNWEYsnNuM7jWmiiKCMOQJEl6FIIgoFAokMvlsCyLdruN1ponrutOAM8BfN/fpZQaT5KkCOyPkySJ4jgeyfZqrclms7jdbr/q+34K0ADx/WC9uq7Wxn9q6w/8BuLkuaAe2mPDAAAAAElFTkSuQmCC',
       active: false,
     },
   ];
@@ -105,7 +113,9 @@ export class TabBar extends LitElement {
       border-radius: 2px;
       color: var(--firefox-text-secondary);
       opacity: 0;
-      transition: opacity 0.2s, background 0.2s;
+      transition:
+        opacity 0.2s,
+        background 0.2s;
     }
 
     .tab:hover .tab-close,
@@ -173,16 +183,15 @@ export class TabBar extends LitElement {
       background: rgba(255, 255, 255, 0.1);
     }
 
-    .menu-dots {
-      display: flex;
-      gap: 2px;
+    .menu-button svg {
+      width: 16px;
+      height: 16px;
     }
 
-    .menu-dot {
-      width: 4px;
-      height: 4px;
-      background: currentColor;
-      border-radius: 50%;
+    .firefox-view-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--firefox-text-secondary);
     }
   `;
 
@@ -195,9 +204,16 @@ export class TabBar extends LitElement {
               class="tab ${tab.active ? 'active' : ''}"
               @click=${() => this.handleTabClick(tab.id)}
             >
-              ${tab.favicon
-                ? html`<img class="tab-favicon" src=${tab.favicon} alt="" />`
-                : ''}
+              ${tab.favicon === 'firefox-view'
+                ? html`<svg class="firefox-view-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path
+                      d="M3 2a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1V3a1 1 0 00-1-1H3zm1 2h8v8H4V4z"
+                    />
+                    <path d="M5 5h6v1H5V5zm0 2h6v1H5V7zm0 2h4v1H5V9z" />
+                  </svg>`
+                : tab.favicon
+                  ? html`<img class="tab-favicon" src=${tab.favicon} alt="" />`
+                  : ''}
               <span class="tab-title">${tab.title}</span>
               <button
                 class="tab-close"
@@ -209,12 +225,10 @@ export class TabBar extends LitElement {
         <button class="new-tab" @click=${this.handleNewTab}></button>
       </div>
       <div class="toolbar-end">
-        <button class="menu-button" @click=${this.handleMenu}>
-          <div class="menu-dots">
-            <div class="menu-dot"></div>
-            <div class="menu-dot"></div>
-            <div class="menu-dot"></div>
-          </div>
+        <button class="menu-button" @click=${this.handleMenu} title="List all tabs">
+          <svg viewBox="0 0 16 16" fill="currentColor">
+            <path d="M4 6l4 4 4-4H4z" />
+          </svg>
         </button>
       </div>
     `;
@@ -237,16 +251,16 @@ export class TabBar extends LitElement {
 
   private handleCloseTab(e: Event, tabId: string) {
     e.stopPropagation();
-    
+
     if (this.tabs.length === 1) {
       return;
     }
 
     const tabIndex = this.tabs.findIndex((tab) => tab.id === tabId);
     const wasActive = this.tabs[tabIndex].active;
-    
+
     this.tabs = this.tabs.filter((tab) => tab.id !== tabId);
-    
+
     if (wasActive && this.tabs.length > 0) {
       const newActiveIndex = Math.min(tabIndex, this.tabs.length - 1);
       this.tabs[newActiveIndex].active = true;

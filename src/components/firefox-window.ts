@@ -1,18 +1,23 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import './tab-bar';
+import './navigation-bar';
+import './panel-menu';
 
 @customElement('firefox-window')
 export class FirefoxWindow extends LitElement {
   @state()
   private isFullscreen = false;
 
+  @state()
+  activeMenu: string | null = null;
+
   static styles = css`
     :host {
       display: flex;
       flex-direction: column;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       background: var(--firefox-bg);
       color: var(--firefox-text);
       position: relative;
@@ -96,6 +101,28 @@ export class FirefoxWindow extends LitElement {
       font-size: 16px;
       color: #15141a;
     }
+
+    /* Menu styles */
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      gap: 12px;
+      color: var(--firefox-text);
+      text-decoration: none;
+    }
+
+    .menu-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-separator {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 8px 0;
+    }
   `;
 
   render() {
@@ -108,18 +135,84 @@ export class FirefoxWindow extends LitElement {
         </div>
       </div>
       <div class="tab-bar">
-        <tab-bar></tab-bar>
+        <tab-bar @menu-clicked=${() => this.toggleMenu('tab-menu')}></tab-bar>
       </div>
       <div class="toolbar">
-        <!-- Navigation bar with URL bar will go here -->
+        <navigation-bar @menu-clicked=${() => this.toggleMenu('hamburger')}></navigation-bar>
       </div>
       <div class="content-area">
-        <div class="main-content">
-          New Tab
-        </div>
+        <div class="main-content">New Tab</div>
       </div>
+
+      <!-- Placeholder menus -->
+      ${this.renderMenus()}
     `;
   }
+
+  private renderMenus() {
+    return html`
+      <panel-menu
+        .open=${this.activeMenu === 'tab-menu'}
+        style="top: 64px; right: 8px;"
+        title="All Tabs"
+      >
+        <div class="menu-item">Search Tabs...</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">Close Tab</div>
+        <div class="menu-item">Close Other Tabs</div>
+        <div class="menu-item">Close Tabs to the Right</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">Move Tab</div>
+        <div class="menu-item">Reopen Closed Tab</div>
+      </panel-menu>
+
+      <panel-menu
+        .open=${this.activeMenu === 'hamburger'}
+        style="top: 100px; right: 8px;"
+        title="Firefox"
+      >
+        <div class="menu-item">New Window</div>
+        <div class="menu-item">New Private Window</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">Bookmarks</div>
+        <div class="menu-item">History</div>
+        <div class="menu-item">Downloads</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">Add-ons and Themes</div>
+        <div class="menu-item">Settings</div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">More Tools</div>
+        <div class="menu-item">Help</div>
+      </panel-menu>
+    `;
+  }
+
+  private toggleMenu(menuId: string) {
+    this.activeMenu = this.activeMenu === menuId ? null : menuId;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    document.addEventListener('click', this.handleDocumentClick);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('click', this.handleDocumentClick);
+  }
+
+  private handleDocumentClick = (e: MouseEvent) => {
+    const path = e.composedPath();
+    const isMenuClick = path.some(
+      (el) =>
+        el instanceof HTMLElement &&
+        (el.classList?.contains('menu-button') || el.tagName?.toLowerCase() === 'panel-menu')
+    );
+
+    if (!isMenuClick && this.activeMenu) {
+      this.activeMenu = null;
+    }
+  };
 
   private handleClose() {
     console.log('Close window');
