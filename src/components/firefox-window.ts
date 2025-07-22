@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import './tab-bar';
 
 @customElement('firefox-window')
 export class FirefoxWindow extends LitElement {
@@ -107,7 +108,7 @@ export class FirefoxWindow extends LitElement {
         </div>
       </div>
       <div class="tab-bar">
-        <!-- Tab bar will go here -->
+        <tab-bar></tab-bar>
       </div>
       <div class="toolbar">
         <!-- Navigation bar with URL bar will go here -->
