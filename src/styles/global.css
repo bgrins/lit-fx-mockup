@@ -1,9 +1,9 @@
 :root {
   /* Dark theme (default) */
-  --firefox-bg: #1c1b22;
-  --firefox-toolbar-bg: #2b2a33;
+  --firefox-bg: #2b2a33;
+  --firefox-toolbar-bg: #42414d;
   --firefox-tab-bg: #42414d;
-  --firefox-tab-active-bg: #52515e;
+  --firefox-tab-active-bg: #1c1b22;
   --firefox-text: #fbfbfe;
   --firefox-text-secondary: #bfbfc9;
   --firefox-border: #3a394d;
@@ -17,9 +17,9 @@
   --firefox-icon-hover: #ffffff;
   --firefox-icon-active: #00ddff;
 
-  /* Content area colors */
-  --firefox-content-bg: #f9f9fb;
-  --firefox-content-text: #15141a;
+  /* Content area colors - match active tab in dark theme */
+  --firefox-content-bg: #1c1b22;
+  --firefox-content-text: #fbfbfe;
 
   --mac-close: #ff5f57;
   --mac-minimize: #ffbd2e;
@@ -27,7 +27,7 @@
 
   --toolbar-height: 40px;
   --urlbar-height: 32px;
-  --tab-height: 36px;
+  --tab-height: 48px;
 }
 
 /* Light theme */
@@ -49,7 +49,7 @@
   --firefox-icon-hover: #000000;
   --firefox-icon-active: #0060df;
 
-  /* Content area colors for light theme */
+  /* Content area colors for light theme - match active tab */
   --firefox-content-bg: #ffffff;
   --firefox-content-text: #15141a;
 }

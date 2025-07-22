@@ -181,21 +181,39 @@ npm test  # Run Vitest unit tests
 ### Precommit checklist
 
 - `npm run precommit`. Fix all errors, do not be lazy.
+- `npm run test`. Fix all errors, do not be lazy.
 
 ### Keyboard Shortcuts
 
-All shortcuts use the **Alt** key to avoid conflicts with browser shortcuts:
+The mockup detects your platform and uses appropriate modifiers:
 
+**On macOS:**
+- **Cmd+T**: New tab (may be intercepted by browser)
+- **Cmd+W**: Close current tab (may be intercepted by browser)
+- **Cmd+L**: Focus URL bar
+- **Cmd+1-9**: Switch to tab by number
+- **Cmd+Shift+T**: Toggle between light/dark theme
+
+**On Windows/Linux:**
 - **Alt+T**: New tab
 - **Alt+W**: Close current tab
 - **Alt+L**: Focus URL bar
 - **Alt+1-9**: Switch to tab by number
 - **Alt+Shift+T**: Toggle between light/dark theme
 
-Note: Using Alt key instead of Cmd/Ctrl ensures these shortcuts work reliably in all browsers without being intercepted.
+**Fallback shortcuts (all platforms):**
+- **Ctrl+N**: New tab
+- **Ctrl+Shift+T**: Toggle theme
+
+The implementation includes:
+- Platform detection to use Cmd on Mac, Alt on others
+- Debug logging for all key events
+- Visual feedback when shortcuts are triggered
+- On-screen help showing available shortcuts
 
 ## Implementation Notes
 - Start with the window shell and work inward
 - Stub out UI transitions for buttons that open additional views
 - Use URL hash for initial states, but don't implement full routing
 - Focus on extensibility - make it easy to add new components and features
+- DO NOT keep things around for backwards compatibility. This is a rapid development environment, just update test assertions and delete the old code when applicable.

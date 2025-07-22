@@ -53,6 +53,17 @@ export class NavigationBar extends LitElement {
       fill: currentColor;
     }
 
+    /* Icon mask approach for better theme support */
+    .icon-mask {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background-color: currentColor;
+      mask-size: 16px;
+      mask-repeat: no-repeat;
+      mask-position: center;
+    }
+
     .urlbar-container {
       flex: 1;
       height: var(--urlbar-height);
@@ -110,16 +121,36 @@ export class NavigationBar extends LitElement {
     return html`
       <!-- Navigation buttons -->
       <button class="nav-button" @click=${this.handleBack} disabled>
-        <img src="/src/assets/browser/themes/shared/icons/back.svg" alt="Back" />
+        <span
+          class="icon-mask"
+          style="mask-image: url(/assets/browser/themes/shared/icons/back.svg);"
+          role="img"
+          aria-label="Back"
+        ></span>
       </button>
       <button class="nav-button" @click=${this.handleForward} disabled>
-        <img src="/src/assets/browser/themes/shared/icons/forward.svg" alt="Forward" />
+        <span
+          class="icon-mask"
+          style="mask-image: url(/assets/browser/themes/shared/icons/forward.svg);"
+          role="img"
+          aria-label="Forward"
+        ></span>
       </button>
       <button class="nav-button" @click=${this.handleRefresh}>
-        <img src="/src/assets/browser/themes/shared/icons/reload-to-stop.svg" alt="Refresh" />
+        <span
+          class="icon-mask"
+          style="mask-image: url(/assets/toolkit/themes/shared/icons/reload.svg);"
+          role="img"
+          aria-label="Refresh"
+        ></span>
       </button>
       <button class="nav-button" @click=${this.handleHome}>
-        <img src="/src/assets/browser/themes/shared/icons/home.svg" alt="Home" />
+        <span
+          class="icon-mask"
+          style="mask-image: url(/assets/browser/themes/shared/icons/home.svg);"
+          role="img"
+          aria-label="Home"
+        ></span>
       </button>
 
       <!-- URL Bar -->
@@ -142,25 +173,33 @@ export class NavigationBar extends LitElement {
       <!-- End buttons -->
       <div class="nav-end">
         <button class="nav-button" title="Extensions">
-          <svg viewBox="0 0 16 16" fill="currentColor">
-            <path
-              d="M6 2a2 2 0 00-2 2v1H3a1 1 0 00-1 1v3h2v1a2 2 0 004 0V9h1a2 2 0 000-4H8V4a2 2 0 00-2-2z"
-            />
-            <path
-              d="M10 7v1a2 2 0 00-2 2v1H7a2 2 0 000 4h1v1a2 2 0 004 0v-1h1a1 1 0 001-1v-3h-2V9a2 2 0 00-2-2z"
-            />
-          </svg>
+          <span
+            class="icon-mask"
+            style="mask-image: url(/assets/toolkit/themes/shared/extensions/extension.svg);"
+            role="img"
+            aria-label="Extensions"
+          ></span>
         </button>
         <div class="separator"></div>
         <button class="nav-button" title="Account">
-          <img src="/src/assets/browser/themes/shared/fxa/avatar.svg" alt="Account" />
+          <span
+            class="icon-mask"
+            style="mask-image: url(/assets/browser/themes/shared/fxa/avatar.svg);"
+            role="img"
+            aria-label="Account"
+          ></span>
         </button>
         <button
           class="nav-button menu-button"
           title="Open application menu"
           @click=${this.handleMenuClick}
         >
-          <img src="/src/assets/browser/themes/shared/icons/menu.svg" alt="Menu" />
+          <span
+            class="icon-mask"
+            style="mask-image: url(/assets/browser/themes/shared/icons/menu.svg);"
+            role="img"
+            aria-label="Menu"
+          ></span>
         </button>
       </div>
     `;

@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 visual.spec.ts-snapshots/
+.wrangler
 
 test-results
 playwright-report

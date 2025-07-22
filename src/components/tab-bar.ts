@@ -21,13 +21,13 @@ export class TabBar extends LitElement {
     {
       id: '1',
       title: 'Wikipedia, the free encyclopedia',
-      favicon: '/src/assets/sites/wikipedia.ico',
+      favicon: '/assets/sites/wikipedia.ico',
       active: true,
     },
     {
       id: '2',
       title: 'The Wild Story of th...',
-      favicon: '/src/assets/sites/pocket.ico',
+      favicon: '/assets/sites/pocket.ico',
       active: false,
     },
   ];
@@ -35,12 +35,16 @@ export class TabBar extends LitElement {
   @property({ type: String })
   activeTabId = '1';
 
+  @state()
+  hasOverflow = false;
+
   static styles = css`
     :host {
       display: flex;
       align-items: stretch;
       height: 100%;
       flex: 1;
+      min-width: 0;
     }
 
     .tabs-container {
@@ -48,55 +52,66 @@ export class TabBar extends LitElement {
       align-items: stretch;
       flex: 1;
       height: 100%;
-      padding-top: 4px;
+      padding: 2px 0;
+      min-width: 0; /* Allow container to shrink */
+      overflow: hidden; /* Critical: prevent tabs from pushing other elements off screen */
+      position: relative;
+    }
+
+    .tabs-scroll-container {
+      display: flex;
+      align-items: stretch;
+      overflow-x: hidden; /* Hide overflow for now */
+      overflow-y: hidden;
+      min-width: 0; /* Allow container to shrink */
+    }
+
+    .tabs-and-new-tab {
+      display: flex;
+      align-items: stretch;
+      min-width: 0;
     }
 
     .tab {
       display: flex;
       align-items: center;
-      height: 100%;
-      min-width: 50px;
-      max-width: 240px;
+      height: calc(100% - 8px);
+      width: 180px;
+      flex-shrink: 0; /* Prevent tabs from shrinking */
+      flex-grow: 0;
       padding: 0 12px;
-      background: var(--firefox-toolbar-bg);
-      border-radius: 4px 4px 0 0;
+      background: transparent;
+      border-radius: 6px;
       cursor: pointer;
       position: relative;
       transition: background 0.2s;
       gap: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid transparent;
       border-bottom: none;
-      margin-right: 1px;
+      margin-right: 2px;
+      margin-bottom: 4px;
     }
 
     .tab.firefox-view {
-      min-width: 40px;
-      max-width: 40px;
-      padding: 0 8px;
+      width: 16px;
+      margin-inline-start: 24px;
+      margin-inline-end: 16px;
+      flex-shrink: 0;
       gap: 0;
       justify-content: center;
-      margin-right: 8px;
     }
 
-    .tab:hover {
+    .tab:hover:not(.active) {
       background: var(--firefox-hover);
     }
 
     .tab.active {
-      background: var(--firefox-tab-bg);
-      border-color: var(--firefox-border);
-      z-index: 1;
+      background: var(--firefox-content-bg);
+      border: 1px solid var(--firefox-border);
+      border-bottom: none;
+      z-index: 10;
       position: relative;
-    }
-
-    .tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: var(--firefox-tab-bg);
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .tab-favicon {
@@ -105,6 +120,20 @@ export class TabBar extends LitElement {
       flex-shrink: 0;
       -moz-context-properties: fill;
       fill: currentColor;
+    }
+
+    /* Icon mask approach for better theme support */
+    .icon-mask {
+      width: 16px;
+      height: 16px;
+      display: inline-block;
+      background-color: currentColor;
+      -webkit-mask-size: 16px;
+      mask-size: 16px;
+      -webkit-mask-repeat: no-repeat;
+      mask-repeat: no-repeat;
+      -webkit-mask-position: center;
+      mask-position: center;
     }
 
     .tab-title {
@@ -169,18 +198,23 @@ export class TabBar extends LitElement {
         color 0.2s;
       margin-left: 2px;
       align-self: center;
+      flex-shrink: 0;
+    }
+
+    .new-tab.inline {
+      margin-left: 4px;
+    }
+
+    .new-tab.overflow {
+      position: absolute;
+      right: 40px; /* Next to the menu button */
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     .new-tab:hover {
       background: var(--firefox-hover);
       color: var(--firefox-icon-hover);
-    }
-
-    .new-tab img {
-      width: 16px;
-      height: 16px;
-      -moz-context-properties: fill;
-      fill: currentColor;
     }
 
     .toolbar-end {
@@ -212,58 +246,92 @@ export class TabBar extends LitElement {
       color: var(--firefox-icon-hover);
     }
 
-    .menu-button svg,
-    .menu-button img {
-      width: 16px;
-      height: 16px;
-      -moz-context-properties: fill;
-      fill: currentColor;
-    }
-
     .firefox-view-icon {
       width: 16px;
       height: 16px;
       color: var(--firefox-icon-secondary);
+    }
+
+    /* Special handling for Firefox View tab */
+    .tab.firefox-view .icon-mask {
+      color: var(--firefox-icon-secondary);
+    }
+
+    .tab.firefox-view.active .icon-mask {
+      color: var(--firefox-icon-primary);
     }
   `;
 
   render() {
     return html`
       <div class="tabs-container">
-        ${this.tabs.map(
-          (tab) => html`
-            <div
-              class="tab ${tab.active ? 'active' : ''} ${tab.id === 'firefox-view'
-                ? 'firefox-view'
-                : ''}"
-              @click=${() => this.handleTabClick(tab.id)}
-            >
-              ${tab.id === 'firefox-view'
-                ? html`<img
-                    class="tab-favicon"
-                    src="/src/assets/browser/themes/shared/icons/firefox-view.svg"
-                    alt="Firefox View"
-                  />`
-                : tab.favicon
-                  ? html`<img class="tab-favicon" src=${tab.favicon} alt="" />`
-                  : ''}
-              ${tab.id !== 'firefox-view' ? html`<span class="tab-title">${tab.title}</span>` : ''}
-              ${tab.id !== 'firefox-view'
-                ? html`<button
-                    class="tab-close"
-                    @click=${(e: Event) => this.handleCloseTab(e, tab.id)}
-                  ></button>`
-                : ''}
-            </div>
-          `
-        )}
-        <button class="new-tab" @click=${this.handleNewTab}>
-          <img src="/src/assets/browser/themes/shared/icons/new-tab.svg" alt="New Tab" />
-        </button>
+        <div class="tabs-and-new-tab">
+          <div class="tabs-scroll-container">
+            ${this.tabs.map(
+              (tab) => html`
+                <div
+                  class="tab ${tab.active ? 'active' : ''} ${tab.id === 'firefox-view'
+                    ? 'firefox-view'
+                    : ''}"
+                  @click=${() => this.handleTabClick(tab.id)}
+                >
+                  ${tab.id === 'firefox-view'
+                    ? html`<span
+                        class="icon-mask tab-favicon"
+                        style="mask-image: url(/assets/browser/themes/shared/icons/firefox-view.svg);"
+                        role="img"
+                        aria-label="Firefox View"
+                      ></span>`
+                    : tab.favicon
+                      ? html`<img class="tab-favicon" src=${tab.favicon} alt="" />`
+                      : ''}
+                  ${tab.id !== 'firefox-view'
+                    ? html`<span class="tab-title">${tab.title}</span>`
+                    : ''}
+                  ${tab.id !== 'firefox-view'
+                    ? html`<button
+                        class="tab-close"
+                        @click=${(e: Event) => this.handleCloseTab(e, tab.id)}
+                      ></button>`
+                    : ''}
+                </div>
+              `
+            )}
+          </div>
+          ${!this.hasOverflow
+            ? html`
+                <button class="new-tab inline" @click=${this.handleNewTab}>
+                  <span
+                    class="icon-mask"
+                    style="mask-image: url(/assets/browser/themes/shared/icons/new-tab.svg);"
+                    role="img"
+                    aria-label="New Tab"
+                  ></span>
+                </button>
+              `
+            : ''}
+        </div>
+        ${this.hasOverflow
+          ? html`
+              <button class="new-tab overflow" @click=${this.handleNewTab}>
+                <span
+                  class="icon-mask"
+                  style="mask-image: url(/assets/browser/themes/shared/icons/new-tab.svg);"
+                  role="img"
+                  aria-label="New Tab"
+                ></span>
+              </button>
+            `
+          : ''}
       </div>
       <div class="toolbar-end">
         <button class="menu-button" @click=${this.handleMenu} title="List all tabs">
-          <img src="/src/assets/toolkit/themes/shared/icons/sort-arrow.svg" alt="Tab Menu" />
+          <span
+            class="icon-mask"
+            style="mask-image: url(/assets/toolkit/themes/shared/icons/sort-arrow.svg);"
+            role="img"
+            aria-label="Tab Menu"
+          ></span>
         </button>
       </div>
     `;
@@ -275,9 +343,11 @@ export class TabBar extends LitElement {
       active: tab.id === tabId,
     }));
     this.activeTabId = tabId;
+
+    const activeTab = this.tabs.find((tab) => tab.id === tabId);
     this.dispatchEvent(
       new CustomEvent('tab-activated', {
-        detail: { tabId },
+        detail: { tabId, tab: activeTab },
         bubbles: true,
         composed: true,
       })
@@ -292,7 +362,11 @@ export class TabBar extends LitElement {
       return;
     }
 
-    if (this.tabs.length === 1) {
+    // Count non-Firefox-view tabs
+    const nonFirefoxViewTabs = this.tabs.filter((tab) => tab.id !== 'firefox-view');
+
+    // Prevent closing the last non-Firefox-view tab
+    if (nonFirefoxViewTabs.length === 1) {
       return;
     }
 
@@ -327,6 +401,9 @@ export class TabBar extends LitElement {
     this.tabs.push(newTab);
     this.activeTabId = newTab.id;
 
+    // Check for overflow after adding tab
+    this.checkOverflow();
+
     this.dispatchEvent(
       new CustomEvent('new-tab', {
         detail: { tabId: newTab.id },
@@ -334,6 +411,21 @@ export class TabBar extends LitElement {
         composed: true,
       })
     );
+  }
+
+  private checkOverflow() {
+    requestAnimationFrame(() => {
+      const container = this.shadowRoot?.querySelector('.tabs-container');
+      const tabsAndNewTab = this.shadowRoot?.querySelector('.tabs-and-new-tab');
+
+      if (container && tabsAndNewTab) {
+        const containerWidth = container.clientWidth;
+        const tabsWidth = tabsAndNewTab.scrollWidth;
+        const menuButtonWidth = 40; // Account for menu button width
+
+        this.hasOverflow = tabsWidth > containerWidth - menuButtonWidth;
+      }
+    });
   }
 
   private handleMenu() {
@@ -344,4 +436,24 @@ export class TabBar extends LitElement {
       })
     );
   }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    // Check for overflow on initial render and window resize
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  firstUpdated() {
+    this.checkOverflow();
+  }
+
+  private handleResize = () => {
+    this.checkOverflow();
+  };
 }

@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import './firefox-window';
 import type { FirefoxWindow } from './firefox-window';
 import type { ContextMenu, ContextMenuItem } from './context-menu';
+import type { TabBar } from './tab-bar';
+import type { NavigationBar } from './navigation-bar';
 
 describe('FirefoxWindow', () => {
   let element: FirefoxWindow;
@@ -30,7 +32,8 @@ describe('FirefoxWindow', () => {
   it('renders content area', () => {
     const content = element.shadowRoot!.querySelector('.main-content');
     expect(content).toBeTruthy();
-    expect(content!.textContent).toContain('Wikipedia, the free encyclopedia');
+    // Content area now shows an iframe for tabs, or fallback content
+    expect(content!.querySelector('iframe') || content!.textContent).toBeTruthy();
   });
 
   it('toggles menu when menu button is clicked', async () => {
@@ -142,6 +145,137 @@ describe('FirefoxWindow', () => {
       expect(menuLabels).toContain('Forward');
       expect(menuLabels).toContain('Reload');
       expect(menuLabels).toContain('Bookmark This Page');
+    });
+  });
+
+  describe('Keyboard Shortcuts', () => {
+    it('creates new tab with platform-specific shortcut', async () => {
+      const tabBar = element.shadowRoot!.querySelector('tab-bar') as TabBar;
+      const initialTabCount = tabBar.tabs.length;
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+
+      const event = new KeyboardEvent('keydown', {
+        key: 't',
+        code: 'KeyT',
+        altKey: !isMac,
+        metaKey: isMac,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      expect(tabBar.tabs.length).toBe(initialTabCount + 1);
+      expect(tabBar.tabs[tabBar.tabs.length - 1].title).toBe('New Tab');
+    });
+
+    it('focuses URL bar with Alt+L', async () => {
+      const navBar = element.shadowRoot!.querySelector('navigation-bar') as NavigationBar;
+      const urlInput = navBar.shadowRoot!.querySelector('.urlbar-input') as HTMLInputElement;
+
+      const focusSpy = vi.spyOn(urlInput, 'focus');
+      const selectSpy = vi.spyOn(urlInput, 'select');
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'l',
+        code: 'KeyL',
+        altKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      expect(focusSpy).toHaveBeenCalled();
+      expect(selectSpy).toHaveBeenCalled();
+    });
+
+    it('toggles theme with Alt+Shift+T', async () => {
+      const initialTheme = document.documentElement.getAttribute('data-theme');
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'T',
+        code: 'KeyT',
+        altKey: true,
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      const newTheme = document.documentElement.getAttribute('data-theme');
+      expect(newTheme).not.toBe(initialTheme);
+    });
+
+    it('switches to tab by index with Alt+Number', async () => {
+      const tabBar = element.shadowRoot!.querySelector('tab-bar') as TabBar;
+
+      // Ensure we have at least 2 tabs
+      if (tabBar.tabs.length < 2) {
+        tabBar.handleNewTab();
+        await element.updateComplete;
+      }
+
+      // Switch to second tab (Alt+2)
+      const event = new KeyboardEvent('keydown', {
+        key: '2',
+        code: 'Digit2',
+        altKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      expect(tabBar.tabs[1].active).toBe(true);
+      expect(tabBar.tabs[0].active).toBe(false);
+    });
+
+    it('closes active tab with Alt+W', async () => {
+      const tabBar = element.shadowRoot!.querySelector('tab-bar') as TabBar;
+
+      // Add a new tab to ensure we can close one
+      tabBar.handleNewTab();
+      await element.updateComplete;
+
+      const initialTabCount = tabBar.tabs.length;
+      const activeTabId = tabBar.tabs.find((tab) => tab.active)?.id;
+
+      const event = new KeyboardEvent('keydown', {
+        key: 'w',
+        code: 'KeyW',
+        altKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      expect(tabBar.tabs.length).toBe(initialTabCount - 1);
+      expect(tabBar.tabs.find((tab) => tab.id === activeTabId)).toBeUndefined();
+    });
+
+    it('prevents default browser behavior for Alt shortcuts', async () => {
+      const event = new KeyboardEvent('keydown', {
+        key: 't',
+        code: 'KeyT',
+        altKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
+
+      document.dispatchEvent(event);
+      await element.updateComplete;
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
     });
   });
 

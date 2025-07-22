@@ -17,10 +17,13 @@ export class FirefoxWindow extends LitElement {
   activeMenu: string | null = null;
 
   @state()
-  private activeTabTitle = 'Wikipedia, the free encyclopedia';
+  private activeTab: Tab | null = null;
 
   @state()
   private currentTheme: 'dark' | 'light' = 'dark';
+
+  @state()
+  private shortcutPressed = '';
 
   static styles = css`
     :host {
@@ -83,6 +86,10 @@ export class FirefoxWindow extends LitElement {
       padding: 0 8px;
       gap: 4px;
       flex-shrink: 0;
+      /* Add shadow to create the floating effect */
+      box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 2;
     }
 
     .toolbar {
@@ -94,6 +101,9 @@ export class FirefoxWindow extends LitElement {
       padding: 0 8px;
       gap: 8px;
       flex-shrink: 0;
+      /* Push the toolbar down slightly to create visual separation */
+      position: relative;
+      z-index: 1;
     }
 
     .content-area {
@@ -104,12 +114,20 @@ export class FirefoxWindow extends LitElement {
 
     .main-content {
       flex: 1;
-      background: var(--firefox-content-bg, #f9f9fb);
+      background: var(--firefox-content-bg);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 16px;
-      color: var(--firefox-content-text, #15141a);
+      color: var(--firefox-content-text);
+      position: relative;
+    }
+
+    .tab-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
     }
 
     /* Menu styles */
@@ -182,7 +200,49 @@ export class FirefoxWindow extends LitElement {
     }
 
     .theme-indicator:hover {
-      background: var(--firefox-hover);
+      background: var(--firefox-tab-bg);
+    }
+
+    .shortcut-indicator {
+      position: absolute;
+      bottom: 48px;
+      right: 8px;
+      font-size: 12px;
+      color: var(--firefox-text);
+      background: var(--firefox-toolbar-bg);
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--firefox-border);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .shortcut-indicator.active {
+      opacity: 1;
+    }
+
+    .shortcuts-help {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      font-size: 11px;
+      color: var(--firefox-text-secondary);
+      background: var(--firefox-toolbar-bg);
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid var(--firefox-border);
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    .shortcuts-help kbd {
+      background: var(--firefox-tab-bg);
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 10px;
+      border: 1px solid var(--firefox-border);
     }
   `;
 
@@ -205,7 +265,7 @@ export class FirefoxWindow extends LitElement {
         <navigation-bar @menu-clicked=${() => this.toggleMenu('hamburger')}></navigation-bar>
       </div>
       <div class="content-area">
-        <div class="main-content">${this.activeTabTitle}</div>
+        <div class="main-content">${this.renderContent()}</div>
       </div>
 
       <!-- Placeholder menus -->
@@ -222,7 +282,58 @@ export class FirefoxWindow extends LitElement {
       >
         Theme: ${this.currentTheme}
       </button>
+
+      <!-- Shortcut indicator -->
+      <div class="shortcut-indicator ${this.shortcutPressed ? 'active' : ''}">
+        ${this.shortcutPressed}
+      </div>
+
+      <!-- Shortcuts help -->
+      <div class="shortcuts-help">
+        Keyboard shortcuts:
+        <kbd>Alt+T</kbd> New tab, <kbd>Alt+L</kbd> Focus URL, <kbd>Alt+W</kbd> Close tab,
+        <kbd>Alt+Shift+T</kbd> Toggle theme
+      </div>
     `;
+  }
+
+  private renderContent() {
+    if (!this.activeTab) {
+      return 'New Tab';
+    }
+
+    // Map specific tab IDs to their pre-registered frames
+    const frameMap: Record<string, string | null> = {
+      '1': '/frames/wikipedia.html', // Wikipedia tab
+      'firefox-view': null, // Firefox View doesn't use iframe
+    };
+
+    // Special handling for Firefox View
+    if (this.activeTab.id === 'firefox-view') {
+      return html`<div style="font-size: 24px; color: var(--firefox-text-secondary);">
+        Firefox View
+      </div>`;
+    }
+
+    // Check if we have a pre-registered frame for this tab
+    const frameSrc = frameMap[this.activeTab.id];
+
+    if (frameSrc) {
+      // Load the pre-registered frame
+      return html`<iframe
+        class="tab-iframe"
+        src="${frameSrc}"
+        title="${this.activeTab.title}"
+      ></iframe>`;
+    } else {
+      // Load the fallback frame with the tab title as a parameter
+      const fallbackUrl = `/frames/fallback.html?title=${encodeURIComponent(this.activeTab.title)}`;
+      return html`<iframe
+        class="tab-iframe"
+        src="${fallbackUrl}"
+        title="${this.activeTab.title}"
+      ></iframe>`;
+    }
   }
 
   private renderMenus() {
@@ -260,6 +371,18 @@ export class FirefoxWindow extends LitElement {
     document.addEventListener('click', this.handleDocumentClick);
     this.addEventListener('contextmenu', this.handleContextMenu);
     document.addEventListener('keydown', this.handleKeyDown);
+
+    // Initialize activeTab based on initial tabs
+    requestAnimationFrame(() => {
+      const tabBar = this.shadowRoot?.querySelector('tab-bar') as TabBar;
+      if (tabBar && tabBar.tabs) {
+        const initialActiveTab = tabBar.tabs.find((tab: Tab) => tab.active);
+        if (initialActiveTab) {
+          this.activeTab = initialActiveTab;
+          this.updateUrlBar(initialActiveTab);
+        }
+      }
+    });
   }
 
   disconnectedCallback() {
@@ -296,40 +419,78 @@ export class FirefoxWindow extends LitElement {
   }
 
   private handleKeyDown = (e: KeyboardEvent) => {
-    // Alt + Shift + T to toggle theme
-    if (e.key === 'T' && e.shiftKey && e.altKey) {
+    // Debug logging
+    console.log('Key pressed:', {
+      key: e.key,
+      code: e.code,
+      altKey: e.altKey,
+      ctrlKey: e.ctrlKey,
+      metaKey: e.metaKey,
+      shiftKey: e.shiftKey,
+      platform: navigator.platform,
+    });
+
+    // On Mac, use Cmd instead of Alt to avoid Option key character insertion
+    const modKey = e.altKey;
+
+    // Cmd/Alt + Shift + T to toggle theme
+    if (e.code === 'KeyT' && e.shiftKey && modKey) {
       e.preventDefault();
       this.toggleTheme();
+      this.showShortcutFeedback('Theme toggled');
       return;
     }
 
-    // Alt + T for new tab
-    if (e.key === 't' && e.altKey && !e.shiftKey) {
+    // Cmd/Alt + T for new tab (note: Cmd+T might be intercepted by browser)
+    if (e.code === 'KeyT' && modKey && !e.shiftKey) {
       e.preventDefault();
       this.handleNewTab();
+      this.showShortcutFeedback('New tab created');
       return;
     }
 
-    // Alt + W to close tab
-    if (e.key === 'w' && e.altKey) {
+    // Cmd/Alt + W to close tab (note: Cmd+W might be intercepted by browser)
+    if (e.code === 'KeyW' && modKey) {
       e.preventDefault();
       this.handleCloseCurrentTab();
+      this.showShortcutFeedback('Tab closed');
       return;
     }
 
-    // Alt + L to focus URL bar
-    if (e.key === 'l' && e.altKey) {
+    // Cmd/Alt + L to focus URL bar
+    if (e.code === 'KeyL' && modKey) {
       e.preventDefault();
       this.focusUrlBar();
+      this.showShortcutFeedback('URL bar focused');
       return;
     }
 
-    // Alt + Number to switch tabs (1-9)
-    if (e.altKey && e.key >= '1' && e.key <= '9') {
+    // Cmd/Alt + Number to switch tabs (1-9)
+    if (modKey && e.code >= 'Digit1' && e.code <= 'Digit9') {
       e.preventDefault();
-      const tabIndex = parseInt(e.key) - 1;
+      const tabIndex = parseInt(e.code.slice(-1)) - 1;
       this.switchToTabByIndex(tabIndex);
+      this.showShortcutFeedback(`Switched to tab ${e.code.slice(-1)}`);
       return;
+    }
+
+    // Fallback: Also support Ctrl key combinations on all platforms
+    if (e.ctrlKey && !e.altKey && !e.metaKey) {
+      // Ctrl + Shift + T to toggle theme
+      if (e.code === 'KeyT' && e.shiftKey) {
+        e.preventDefault();
+        this.toggleTheme();
+        this.showShortcutFeedback('Theme toggled (Ctrl)');
+        return;
+      }
+
+      // Ctrl + N for new tab (less likely to be intercepted than Ctrl+T)
+      if (e.code === 'KeyN') {
+        e.preventDefault();
+        this.handleNewTab();
+        this.showShortcutFeedback('New tab created (Ctrl+N)');
+        return;
+      }
     }
   };
 
@@ -339,12 +500,28 @@ export class FirefoxWindow extends LitElement {
     console.log(`Switched to ${this.currentTheme} theme`);
   }
 
-  private handleTabActivated(e: CustomEvent<{ tabId: string }>) {
-    const tabBar = this.shadowRoot?.querySelector('tab-bar') as TabBar;
-    if (tabBar && tabBar.tabs) {
-      const activeTab = tabBar.tabs.find((tab: Tab) => tab.id === e.detail.tabId);
-      if (activeTab) {
-        this.activeTabTitle = activeTab.title;
+  private handleTabActivated(e: CustomEvent<{ tabId: string; tab: Tab }>) {
+    const activeTab = e.detail.tab;
+    if (activeTab) {
+      this.activeTab = activeTab;
+      this.updateUrlBar(activeTab);
+    }
+  }
+
+  private updateUrlBar(tab: Tab) {
+    const navBar = this.shadowRoot?.querySelector('navigation-bar') as NavigationBar;
+    if (navBar) {
+      // Map tab titles to URLs for demonstration
+      const urlMap: Record<string, string> = {
+        'Wikipedia, the free encyclopedia': 'https://en.wikipedia.org/',
+        'The Wild Story of th...': 'https://getpocket.com/',
+      };
+
+      if (tab.id === 'firefox-view') {
+        navBar.setAttribute('url', 'about:firefox-view');
+      } else {
+        const url = urlMap[tab.title] || 'about:blank';
+        navBar.setAttribute('url', url);
       }
     }
   }
@@ -450,31 +627,30 @@ export class FirefoxWindow extends LitElement {
     }
   }
 
+  private showShortcutFeedback(message: string) {
+    this.shortcutPressed = message;
+    setTimeout(() => {
+      this.shortcutPressed = '';
+    }, 2000);
+  }
+
   private renderHamburgerMenuContent() {
     return html`
       <!-- New Tab -->
       <div class="menu-item">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/new-tab.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/new-tab.svg" alt="" />
         <span class="menu-item-label">New Tab</span>
         <span class="menu-item-shortcut">⌘T</span>
       </div>
       <div class="menu-item">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/window.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/window.svg" alt="" />
         <span class="menu-item-label">New Window</span>
         <span class="menu-item-shortcut">⌘N</span>
       </div>
       <div class="menu-item">
         <img
           class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/privateBrowsing.svg"
+          src="/assets/browser/themes/shared/icons/privateBrowsing.svg"
           alt=""
         />
         <span class="menu-item-label">New Private Window</span>
@@ -484,37 +660,25 @@ export class FirefoxWindow extends LitElement {
 
       <!-- Bookmarks & History -->
       <div class="menu-item has-submenu">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/bookmark.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/bookmark.svg" alt="" />
         <span class="menu-item-label">Bookmarks</span>
       </div>
       <div class="menu-item has-submenu">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/history.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/history.svg" alt="" />
         <span class="menu-item-label">History</span>
         <span class="menu-item-shortcut">⌘Y</span>
       </div>
       <div class="menu-item">
         <img
           class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/downloads/downloads.svg"
+          src="/assets/browser/themes/shared/downloads/downloads.svg"
           alt=""
         />
         <span class="menu-item-label">Downloads</span>
         <span class="menu-item-shortcut">⇧⌘J</span>
       </div>
       <div class="menu-item">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/login.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/login.svg" alt="" />
         <span class="menu-item-label">Passwords</span>
       </div>
       <div class="menu-separator"></div>
@@ -523,7 +687,7 @@ export class FirefoxWindow extends LitElement {
       <div class="menu-item">
         <img
           class="menu-item-icon"
-          src="/src/assets/toolkit/themes/shared/extensions/extension.svg"
+          src="/assets/toolkit/themes/shared/extensions/extension.svg"
           alt=""
         />
         <span class="menu-item-label">Extensions and themes</span>
@@ -532,23 +696,19 @@ export class FirefoxWindow extends LitElement {
 
       <!-- Print & Save -->
       <div class="menu-item">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/toolkit/themes/shared/icons/print.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/toolkit/themes/shared/icons/print.svg" alt="" />
         <span class="menu-item-label">Print…</span>
         <span class="menu-item-shortcut">⌘P</span>
       </div>
       <div class="menu-item">
-        <img class="menu-item-icon" src="/src/assets/browser/themes/shared/icons/save.svg" alt="" />
+        <img class="menu-item-icon" src="/assets/browser/themes/shared/icons/save.svg" alt="" />
         <span class="menu-item-label">Save page as…</span>
         <span class="menu-item-shortcut">⌘S</span>
       </div>
       <div class="menu-item">
         <img
           class="menu-item-icon"
-          src="/src/assets/toolkit/themes/shared/icons/search-glass.svg"
+          src="/assets/toolkit/themes/shared/icons/search-glass.svg"
           alt=""
         />
         <span class="menu-item-label">Find in page…</span>
@@ -560,7 +720,7 @@ export class FirefoxWindow extends LitElement {
       <div class="menu-item">
         <img
           class="menu-item-icon"
-          src="/src/assets/browser/themes/shared/icons/translations.svg"
+          src="/assets/browser/themes/shared/icons/translations.svg"
           alt=""
         />
         <span class="menu-item-label">Translate page…</span>
@@ -574,17 +734,13 @@ export class FirefoxWindow extends LitElement {
 
       <!-- Settings & More -->
       <div class="menu-item">
-        <img
-          class="menu-item-icon"
-          src="/src/assets/toolkit/themes/shared/icons/settings.svg"
-          alt=""
-        />
+        <img class="menu-item-icon" src="/assets/toolkit/themes/shared/icons/settings.svg" alt="" />
         <span class="menu-item-label">Settings</span>
       </div>
       <div class="menu-item has-submenu">
         <img
           class="menu-item-icon"
-          src="/src/assets/toolkit/themes/shared/icons/developer.svg"
+          src="/assets/toolkit/themes/shared/icons/developer.svg"
           alt=""
         />
         <span class="menu-item-label">More tools</span>
@@ -593,7 +749,7 @@ export class FirefoxWindow extends LitElement {
 
       <!-- Help -->
       <div class="menu-item has-submenu">
-        <img class="menu-item-icon" src="/src/assets/toolkit/themes/shared/icons/help.svg" alt="" />
+        <img class="menu-item-icon" src="/assets/toolkit/themes/shared/icons/help.svg" alt="" />
         <span class="menu-item-label">Help</span>
       </div>
     `;
